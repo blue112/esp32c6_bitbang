@@ -52,11 +52,11 @@ int main(void)
     }
 }
 
-void loop(i)
+void loop(int i)
 {
-    spin(5000000);
+    delay_ms(500);
     pin_unset(LED_PIN);
-    spin(5000000);
+    delay_ms(500);
     pin_set(LED_PIN);
-    printf("Loop %d\n", i);
+    printf("Tick %d: %lld\n", i, uptime_us() / 1000);
 }

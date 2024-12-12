@@ -13,6 +13,14 @@ void call_start_cpu0()
     for (char *p = &_sbss; p < &_ebss;)
         *p++ = '\0';
 
+    // Enable TIMG0
+    *REG(PCR_TIMERGROUP0_TIMER_CLK_CONF_REG) = 0;        // RC_FAST_CLK
+    *REG(PCR_TIMERGROUP0_TIMER_CLK_CONF_REG) |= BIT(22); // Enable
+
+    uint32_t t0_config = 0x1 << 13;
+    t0_config |= BIT(31) | BIT(30);
+    *REG(TIMG_T0CONFIG_REG) = t0_config;
+
     wdt_disable();
 
     spin(500000); // Few ms so we can start serial monitor
@@ -51,22 +59,3 @@ void wdt_disable()
     *REG(LP_WDT_RWDT_WPROTECT_REG) = 0;
     *REG(LP_WDT_SWD_WPROTECT_REG) = 0;
 }
-
-/*void reset_watchdogs()
-{
-    *superwatchdog_protect_reg = WDT_PROTECT_VALUE;
-    *superwatchdog_config_register = *superwatchdog_config_register | BIT(31);
-    *superwatchdog_protect_reg = 0;
-
-    *watchdog_protect_register = WDT_PROTECT_VALUE;
-    *reset_watchdog_register = *reset_watchdog_register | BIT(31);
-    *watchdog_protect_register = 0;
-
-    *timg0_wdt_protect = WDT_PROTECT_VALUE; // Unlock
-    *timg0_wdt_feed = 0xFFFF;
-    *timg0_wdt_protect = 0; // Lock
-
-    *timg1_wdt_protect = WDT_PROTECT_VALUE; // Unlock
-    *timg1_wdt_feed = 0xFFFF;
-    *timg1_wdt_protect = 0; // Lock
-}*/
