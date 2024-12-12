@@ -3,32 +3,9 @@
 #include <time.h>
 #include <errno.h>
 
-const __attribute__((weak)) __attribute__((section(".rodata_desc"))) esp_app_desc_t esp_app_desc = {
-    .magic_word = 0xABCD5432,
-    .version = "1",
-    .project_name = "blink-bitbang",
-    .idf_ver = "none",
-    .secure_version = 0,
-    .time = "",
-    .date = "",
-    .min_efuse_blk_rev_full = 0,
-    .max_efuse_blk_rev_full = 99,
-};
-
 extern char _end, _eram;
 
 static char *s_heap_start, *s_heap_end, *s_brk;
-
-void sleep_us(int32_t us)
-{
-    struct timespec wait_time = {
-        .tv_sec = us / 1000000,
-        .tv_nsec = us % 1000000 * 1000,
-    };
-    while (nanosleep(&wait_time, &wait_time) == -1 && errno == EINTR)
-    {
-    };
-}
 
 void call_start_cpu0()
 {
@@ -37,6 +14,11 @@ void call_start_cpu0()
         *p++ = '\0';
 
     wdt_disable();
+
+    spin(500000); // Few ms so we can start serial monitor
+
+    uint32_t rst_reas = esp_rom_get_reset_reason(0);
+    esp_rom_printf("Reset reason: 0x%02X\n", rst_reas);
 
     main();
 }
@@ -52,18 +34,25 @@ volatile uint32_t *timg1_wdt_feed = TIMG1_WDTFEED_REG;
 
 void wdt_disable()
 {
+    *REG(LP_WDT_RWDT_RTC_WDT_FEED) |= BIT(31);
+
     *REG(TIMG0_WDTWPROTECT_REG) = WDT_PROTECT_VALUE;
     *REG(TIMG1_WDTWPROTECT_REG) = WDT_PROTECT_VALUE;
     *REG(LP_WDT_RWDT_WPROTECT_REG) = WDT_PROTECT_VALUE;
     *REG(LP_WDT_SWD_WPROTECT_REG) = WDT_PROTECT_VALUE;
 
-    *REG(LP_WDT_SWD_CONFIG_REG) |= BIT(30); // Disable
+    *REG(LP_WDT_SWD_CONFIG_REG) |= BIT(18); // Disable
     *REG(TIMG0_WDTCONFIG0_REG) = 0;         // Disable
     *REG(TIMG1_WDTCONFIG0_REG) = 0;         // Disable
     *REG(LP_WDT_RWDT_CONFIG0_REG) = 0;      // Disable
+
+    *REG(TIMG0_WDTWPROTECT_REG) = 0;
+    *REG(TIMG1_WDTWPROTECT_REG) = 0;
+    *REG(LP_WDT_RWDT_WPROTECT_REG) = 0;
+    *REG(LP_WDT_SWD_WPROTECT_REG) = 0;
 }
 
-void reset_watchdogs()
+/*void reset_watchdogs()
 {
     *superwatchdog_protect_reg = WDT_PROTECT_VALUE;
     *superwatchdog_config_register = *superwatchdog_config_register | BIT(31);
@@ -80,4 +69,4 @@ void reset_watchdogs()
     *timg1_wdt_protect = WDT_PROTECT_VALUE; // Unlock
     *timg1_wdt_feed = 0xFFFF;
     *timg1_wdt_protect = 0; // Lock
-}
+}*/

@@ -2,7 +2,6 @@
 #include "system.h"
 
 #include <stdint.h>
-#include <string.h>
 #include <stdio.h>
 
 volatile uint32_t *gpio_out_reg = GPIO_OUT_REG;
@@ -45,16 +44,19 @@ int main(void)
     set_pin_output(LED_PIN);
     pin_set(LED_PIN);
 
+    int i = 0;
+
     while (1)
     {
-        loop();
+        loop(i++);
     }
 }
 
-void loop()
+void loop(i)
 {
     spin(5000000);
     pin_unset(LED_PIN);
     spin(5000000);
     pin_set(LED_PIN);
+    printf("Loop %d\n", i);
 }

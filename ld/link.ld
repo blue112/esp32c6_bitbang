@@ -3,14 +3,8 @@ MEMORY {
   drom   (rw)   : ORIGIN = 0X3ff90000, LENGTH = 64k
   irom   (rwx)  : ORIGIN = 0x40000000, LENGTH = 384k
 
-  cache0 (rwx)  : ORIGIN = 0x40070000, LENGTH = 32k
-  cache1 (rwx)  : ORIGIN = 0x40078000, LENGTH = 32k
   iram   (rwx)  : ORIGIN = 0x50000000, LENGTH = 16k  /* First 1k is vectors */
   dram   (rw)   : ORIGIN = 0x40800000, LENGTH = 512k
-
-  dflash (rw)   : ORIGIN = 0X3f400000, LENGTH = 1024k
-  psram  (rw)   : ORIGIN = 0X3f800000, LENGTH = 1024k
-  iflash (rwx)  : ORIGIN = 0X400c2000, LENGTH = 11512k
 }
 
 _eram = ORIGIN(dram) + LENGTH(dram);
@@ -51,10 +45,12 @@ SECTIONS {
   */
 }
 PROVIDE ( printf = 0x40000028 );
+PROVIDE ( esp_rom_printf = 0x40000028 );
 PROVIDE (uart_tx_one_char = 0x40000058);
 PROVIDE (uart_tx_one_char2 = 0x4000005c);
 PROVIDE (uart_rx_one_char = 0x40000060);
 PROVIDE (uart_rx_one_char_block = 0x40000064);
+PROVIDE (esp_rom_get_reset_reason = 0x40000018);
 
 
 PROVIDE(esp_rom_newlib_init_common_mutexes = 0x400004a4);

@@ -20,5 +20,9 @@ build/$(PROG).bin: build/$(PROG).elf bin/esputil
 flash: build/$(PROG).bin
 	bin/esputil -p /dev/ttyACM* flash 0x0 $<
 
+monitor:
+	@echo "=== MONITORING START"
+	bin/esputil -p /dev/ttyACM8 monitor
+
 clean:
 	-rm build/*

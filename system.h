@@ -1,11 +1,13 @@
 #pragma once
 
 #include <stdint.h>
-
 extern char _sbss;
 extern char _ebss;
 
 int main();
+
+uint32_t esp_rom_get_reset_reason(int cpu_no);
+int esp_rom_printf(const char *fmt, ...);
 
 #define WATCHDOG_BASE 0x600B1C00
 #define TIMG0_BASE 0x60008000
@@ -18,7 +20,7 @@ int main();
 #define LP_WDT_RWDT_RTC_WDT_FEED ((uint32_t *)(WATCHDOG_BASE + 0x0014))
 #define LP_WDT_SWD_CONFIG_REG ((uint32_t *)(WATCHDOG_BASE + 0x001C))
 #define LP_WDT_SWD_WPROTECT_REG ((uint32_t *)(WATCHDOG_BASE + 0x0020))
-#define LP_WDT_RWDT_WPROTECT_REG ((uint32_t *)(WATCHDOG_BASE + 0x0028))
+#define LP_WDT_RWDT_WPROTECT_REG ((uint32_t *)(WATCHDOG_BASE + 0x0018))
 #define TIMG0_WDTFEED_REG ((uint32_t *)(TIMG0_BASE + 0x0060))
 #define TIMG0_WDTWPROTECT_REG ((uint32_t *)(TIMG0_BASE + 0x0064))
 #define TIMG1_WDTFEED_REG ((uint32_t *)(TIMG1_BASE + 0x0060))
