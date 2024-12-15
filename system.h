@@ -50,6 +50,11 @@ void wdt_disable();
 extern int ets_printf(const char *fmt, ...);
 extern int uart_tx_one_char(uint8_t c);
 
+static inline void nop()
+{
+    asm volatile("nop");
+}
+
 static inline void spin(volatile unsigned long count)
 {
     while (count--)
@@ -61,40 +66,24 @@ static inline uint64_t get_tick()
     *REG(TIMG0_TOUPDATE_REG) = 1;
 
     while (*REG(TIMG0_TOUPDATE_REG) != 0)
-        spin(1);
+        nop();
 
     return *REG(TIMG0_TOLO_REG) + ((uint64_t)*REG(TIMG0_TOHI_REG) << 32);
 }
 
 static inline uint64_t uptime_us()
 {
-    return get_tick() / 20;
+    return get_tick();
 }
 
 static inline void delay_us(unsigned long us)
 {
     uint64_t until = uptime_us() + us; // Calculate timeout timestamp
     while (uptime_us() < until)
-        spin(1); // Wait until "until"
+        nop(); // Wait until "until"
 }
 
 static inline void delay_ms(unsigned long ms)
 {
     delay_us(ms * 1000);
 }
-
-typedef struct
-{
-    uint32_t magic_word;             /*!< Magic word ESP_APP_DESC_MAGIC_WORD */
-    uint32_t secure_version;         /*!< Secure version */
-    uint32_t reserv1[2];             /*!< reserv1 */
-    char version[32];                /*!< Application version */
-    char project_name[32];           /*!< Project name */
-    char time[16];                   /*!< Compile time */
-    char date[16];                   /*!< Compile date*/
-    char idf_ver[32];                /*!< Version IDF */
-    uint8_t app_elf_sha256[32];      /*!< sha256 of elf file */
-    uint16_t min_efuse_blk_rev_full; /*!< Minimal eFuse block revision supported by image, in format: major * 100 + minor */
-    uint16_t max_efuse_blk_rev_full; /*!< Maximal eFuse block revision supported by image, in format: major * 100 + minor */
-    uint32_t reserv2[19];            /*!< reserv2 */
-} esp_app_desc_t;

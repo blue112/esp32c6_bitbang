@@ -14,10 +14,10 @@ void call_start_cpu0()
         *p++ = '\0';
 
     // Enable TIMG0
-    *REG(PCR_TIMERGROUP0_TIMER_CLK_CONF_REG) = 0;        // RC_FAST_CLK
+    *REG(PCR_TIMERGROUP0_TIMER_CLK_CONF_REG) = 0;        // RC_XTAL_CLK
     *REG(PCR_TIMERGROUP0_TIMER_CLK_CONF_REG) |= BIT(22); // Enable
 
-    uint32_t t0_config = 0x1 << 13;
+    uint32_t t0_config = 40 << 13;
     t0_config |= BIT(31) | BIT(30);
     *REG(TIMG_T0CONFIG_REG) = t0_config;
 

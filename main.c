@@ -7,11 +7,6 @@
 volatile uint32_t *gpio_out_reg = GPIO_OUT_REG;
 volatile uint32_t *gpio_enable_reg = GPIO_ENABLE_REG;
 
-volatile uint32_t *trace_mem_start_addr_reg = TRACE_MEM_START_ADDR_REG;
-volatile uint32_t *trace_mem_end_addr_reg = TRACE_MEM_END_ADDR_REG;
-volatile uint32_t *trace_trigger_reg = TRACE_TRIGGER_REG;
-volatile uint32_t *trace_mem_addr_update_reg = TRACE_MEM_ADDR_UPDATE_REG;
-
 __attribute__((section(".trace_addr"))) uint32_t trace_memory[256];
 
 void pin_set(uint8_t pin)
